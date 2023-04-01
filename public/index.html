@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<a href="index.html">Home</a>
+<a href="codeDocs/codeDocs.html">Docs</a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FileSense</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Main content wrapper -->
+    <div class="content-wrapper" id="content">
+      <!-- Application logo -->
+      <img src="FileSense Logo.png" alt="FileSense Logo" class="app-logo">
+      <h1>FileSense</h1>
+      <!-- API key input wrapper -->
+      <div class="api-key-wrapper">
+        <input type="password" id="api-key-input" placeholder="Enter your OpenAI API key">
+        <button id="help-button" class="help-button">?</button>
+      </div>
+      <!-- API key modal -->
+      <div id="api-key-modal" class="modal">
+        <div class="modal-content">
+          <h2>How to Get Your OpenAI API Key</h2>
+          <h5>**If you know me, you can type in my first name (lowercase) to skip this**</h5>
+          <ol>
+            <li>Sign up or log in to your OpenAI account at <a href="https://platform.openai.com/signup/" target="_blank">platform.openai.com</a></li>
+            <li>Go to your API Key dashboard at <a href="https://platform.openai.com/account/api-keys" target="_blank">platform.openai.com/account/api-keys</a></li>
+            <li>Click on "Create new secret key"</li>
+            <li>Copy the API key.</li>
+            <li>Paste the API key into the input field.</li>
+          </ol>
+        </div>
+      </div>
+      <!-- File upload section -->
+      <div id="file-upload">
+        <label for="file-input" class="file-input-wrapper">
+          <span>Upload Files</span>
+          <input type="file" id="file-input" multiple>
+        </label>
+        <button id="submit-button" class="styled-button">Process Files</button>
+        <!-- Loading container -->
+        <div id="loading-container" class="hidden">
+          <img src="loading.gif" alt="Loading..." class="loading-gif">
+        </div>
+      </div>
+      <!-- Chat section -->
+      <div id="chat" class="hidden">
+        <div id="chat-history"></div>
+        <!-- Chat input section -->
+        <div id="chat-input">
+          <textarea id="user-input" placeholder="Ask me something..."></textarea>
+          <button id="send-button" class="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Include the app.js script -->
+  <script src="app.js"></script>
+</body>
+</html>
