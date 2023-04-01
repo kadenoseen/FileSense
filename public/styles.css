@@ -11,6 +11,44 @@ body {
   height: 100%;
 }
 
+/* Header and navigation */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-link {
+  color: #333;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #007BFF;
+}
+
+/* Adjust the content-wrapper padding */
+.content-wrapper {
+  padding-top: 60px;
+}
+
+
 body {
   font-family: "Roboto-Thin", sans-serif;
   display: flex;
@@ -265,6 +303,10 @@ div.api-key-wrapper {
   background-color: rgba(0,0,0,0.4);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto;
@@ -277,6 +319,8 @@ div.api-key-wrapper {
   align-items: center;
   flex-direction: column;
   text-align: center;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
 }
 
 .modal-content ol {

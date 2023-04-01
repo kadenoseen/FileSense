@@ -69,21 +69,16 @@ async function processPage(url, apiKey, visited, maxDepth, currentDepth = 0) {
     await page.goto(url, { waitUntil: 'networkidle2' });
 
     const visibleText = await extractVisibleText(page);
-    console.log(visibleText);
-    val += visibleText.length;
-    const urls = await page.$$eval('a', links => links.map(link => link.href));
-    for (const newUrl of urls) {
-      if (newUrl.startsWith('http') && !visited.has(newUrl)) {
-        await processPage(newUrl, apiKey, visited, maxDepth, currentDepth + 1);
-      }
-    }
 
     await browser.close();
+
+    return visibleText;
   } catch (error) {
     console.error(`Error processing page: ${url}`);
     throw error;
   }
 }
+
 
 async function runScrapedText(text, apiKey) {
     try {
@@ -96,11 +91,10 @@ async function runScrapedText(text, apiKey) {
         chunkSize: 1000,
         chunkOverlap: 200,
       });
-  
-      const docs = await textSplitter.splitDocuments([{ text }]);
+      const combinedText = text.join('\n');
+      const docs = await textSplitter.splitDocuments([{ text: combinedText }]);
   
       console.log('creating vector store...');
-      console.log(apiKey);
       const embeddings = new OpenAIEmbeddings({ openAIApiKey: apiKey });
       let complete = false;
   
@@ -129,18 +123,20 @@ async function runScrapedText(text, apiKey) {
     }
   }
   
-export default async function scraper(url, apiKey, maxDepth = 1) {
+export default async function documentationFinder(url, apiKey, maxDepth = 0) {
     try {
         const visited = new Set();
         const visibleTextChunks = [];
+        const visibleText = await processPage(url, apiKey, visited, maxDepth, 0);
         await processPage(url, apiKey, visited, maxDepth, 0, visibleTextChunks);
-
-        let scrapedText = visibleTextChunks.join('\n');
-        if (scrapedText.length > 100000) {
-            scrapedText = scrapedText.substring(0, 100000);
-        }
-        console.log("Scraped " + url);
-        const indexName = await runScrapedText(scrapedText, apiKey);
+        visibleTextChunks.push(visibleText);
+        //let scrapedText = visibleTextChunks.join('\n');
+        //if (scrapedText.length > 100000) {
+        //    scrapedText = scrapedText.substring(0, 100000);
+        //}
+        //console.log("Scraped " + url);
+        const indexName = await runScrapedText(visibleTextChunks, apiKey);
+        
         return indexName;
     } catch (error) {
         console.error(`Error scraping data from URL: ${url}`);

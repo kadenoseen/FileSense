@@ -1,7 +1,6 @@
 let key = null;
 let urlHash = null;
 const url = "http://localhost:3000";
-//const url = "https://filesense.ue.r.appspot.com";
 
 document.addEventListener('DOMContentLoaded', () => {
   const submitButton = document.getElementById('submit-button');
@@ -78,3 +77,25 @@ async function testApiKey(apiKey) {
       throw error;
     }
 }
+
+function toggleModalOpen() {
+  document.body.classList.toggle("modal-open");
+}
+
+// Event listener for the help button click
+document.getElementById("help-button").addEventListener("click", () => {
+  document.getElementById("api-key-modal").style.display = "block";
+  toggleModalOpen();
+});
+
+// Function to close the modal when clicking outside the content or on the content itself
+function closeModal(event) {
+  if (event.target === document.getElementById("api-key-modal") || event.target === document.querySelector(".modal-content")) {
+    document.getElementById("api-key-modal").style.display = "none";
+    toggleModalOpen();
+  }
+}
+
+// Event listeners for closing the modal on click or touch events
+window.addEventListener("click", closeModal);
+window.addEventListener("touchend", closeModal);

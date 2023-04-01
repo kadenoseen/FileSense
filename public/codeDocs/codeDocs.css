@@ -11,13 +11,54 @@ body {
   height: 100%;
 }
 
+h1 {
+  color: #fff;
+}
+
+/* Header and navigation */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-link {
+  color: #ffffff;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #007BFF;
+}
+
+/* Adjust the content-wrapper padding */
+.content-wrapper {
+  padding-top: 60px;
+}
+
 body {
   font-family: "Roboto-Thin", sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  /*background-color: #e7e7e7;*/
+  background-color: #000000;
 }
 
 .hidden {
@@ -161,29 +202,6 @@ body {
   padding: 10px 24px;
 }
 
-.file-input-wrapper {
-  position: relative;
-  display: inline-block;
-  background-color: #289edd;
-  color: #fff;
-  font-size: 18px;
-  margin: 4px 2px;
-  padding: 10px 24px;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.file-input-wrapper input[type="file"] {
-  position: absolute;
-  font-size: 1px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
 
 #user-input {
   font-family: 'Roboto-Medium';
@@ -207,16 +225,37 @@ body {
   padding: 8px 12px;
   font-size: 16px;
   line-height: 1.5;
-  color: #555;
-  background-color: #fff;
+  color: #ffffff;
+  background-color: #000000;
   background-image: none;
-  border: 1px solid #ccc;
+  border: 1px solid #ffffff;
   border-radius: 4px;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 #api-key-input:focus {
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+/* API Key Input */
+#text-input {
+  display: inline-block;
+  padding: 8px 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #ffffff;
+  background-color: #000000;
+  background-image: none;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#text-input:focus {
   border-color: #66afe9;
   outline: 0;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
@@ -262,21 +301,33 @@ div.api-key-wrapper {
   height: 100%;
   overflow: auto;
   line-height: 2;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
+
 .modal-content {
-  background-color: #fefefe;
+  background-color: #000000;
+  color: #fff;
   margin: 15% auto;
   padding: 20px;
   border-radius: 20px;
-  border: 1px solid #888;
+  border: 1px solid #ffffff;
   width: 40%;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   text-align: center;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.modal-content a {
+  color: #c70a0a;
 }
 
 .modal-content ol {
