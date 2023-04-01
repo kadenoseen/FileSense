@@ -24,7 +24,7 @@ Question: {question}
 Answer in Markdown:`);
 
 // Function to create a chain for handling questions and answers
-export const makeChain = (vectorstore, apiKey) => {
+export const makeChat = (vectorstore, apiKey) => {
   // Create a question generator using the condense prompt
   const questionGenerator = new LLMChain({
     llm: new OpenAIChat({ temperature: 0, openAIApiKey: apiKey }),
