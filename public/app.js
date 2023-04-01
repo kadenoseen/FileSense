@@ -1,7 +1,6 @@
 let fileHash = null;
 let apiKey = null;
 const url = "http://localhost:3000";
-// const url = "https://filesense.ue.r.appspot.com";
 
 // Event listener for file input change
 document.getElementById("file-input").addEventListener("change", (event) => {

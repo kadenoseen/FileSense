@@ -1,7 +1,7 @@
 // Import required modules
 import { OpenAIEmbeddings } from 'langchain/embeddings';
 import { PineconeStore } from 'langchain/vectorstores';
-import { makeChain } from '../chains/makechain.js';
+import { makeChat } from './makechat.js';
 import { pinecone } from '../utils/pinecone-client.js';
 import readline from 'readline';
 
@@ -22,7 +22,7 @@ export async function askQuestion(question, indexName, apiKey) {
       textKey: 'text',
     },
   );
-  const chain = makeChain(vectorStore, apiKey);
+  const chain = makeChat(vectorStore, apiKey);
 
   try {
     const response = await chain.call({
