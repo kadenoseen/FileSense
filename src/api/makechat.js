@@ -47,6 +47,6 @@ export const makeChat = (vectorstore, apiKey) => {
     combineDocumentsChain: docChain,
     questionGeneratorChain: questionGenerator,
     returnSourceDocuments: true,
-    k: 2, // Number of source documents to return
+    k: 3, // Number of source documents to return
   });
 };

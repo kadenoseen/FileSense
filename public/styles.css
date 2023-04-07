@@ -284,6 +284,47 @@ div.api-key-wrapper {
   list-style-position: inside;
 }
 
+.sources-button {
+  background-color: #d51515;
+  border: none;
+  color: white;
+  padding: 4px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 2px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.popup {
+  position: fixed;
+  display: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f1f1f1;
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 5px;
+  width: 80%;
+  max-height: 80%;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.popup .title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.popup .source-content {
+  margin-bottom: 10px;
+}
+
+
 @media screen and (max-width: 600px) {
   .modal-content {
     width: 80%;

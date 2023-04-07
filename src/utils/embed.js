@@ -4,7 +4,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings';
 import { PineconeStore } from 'langchain/vectorstores';
 import { pinecone } from './pinecone-client.js';
 import { FileLoader } from './fileLoader.js';
-import { createIndex, deleteIndex } from './requests.js';
+import { describeIndexStats, deleteVectors, generateRandomString } from './requests.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -13,15 +13,21 @@ dotenv.config();
 // Main function to process input files and create embeddings
 export const run = async (buffers, apiKey) => {
   try {
-    console.log("Creating index...");
-    // Create a new Pinecone index
-    const indexName = await createIndex();
-    console.log(`Index created: ${indexName}\nInitializing...`);
-
+    
     // Initialize the Pinecone index
-    const index = pinecone.Index(indexName);
-
-    // Create FileLoader instances for each input file
+    const index = pinecone.Index(process.env.PINECONE_INDEX);
+    let vectorCount = 0;
+    const indexStats = await describeIndexStats();
+    if (indexStats) {
+      vectorCount = indexStats.totalVectorCount || 0;
+    }
+    const namespaces = Object.keys(indexStats.namespaces);
+    console.log(indexStats.namespaces);
+    // delete vectors if they exist
+    if(vectorCount > 900){
+      await deleteVectors(namespaces);
+    }
+    // Create Loader instances for each input file
     const fileLoaders = buffers.map((buffer) => new FileLoader(buffer));
 
     // Load the contents of the files
@@ -40,19 +46,18 @@ export const run = async (buffers, apiKey) => {
     const docs = await textSplitter.splitDocuments(mergedDocs);
     
     console.log('creating vector store...');
-    console.log(apiKey);
 
     // Initialize the OpenAI embeddings
     const embeddings = new OpenAIEmbeddings({openAIApiKey: apiKey});
     let complete = false;
-
+    const namespace = generateRandomString();
     // Loop until the Pinecone store is successfully created
     while (!complete) {
       try {
         // Create the Pinecone store from the documents and embeddings
         await PineconeStore.fromDocuments(docs, embeddings, {
           pineconeIndex: index,
-          textKey: 'text',
+          namespace: namespace,
         });
         console.log("Index initialized successfully.");
         complete = true;
@@ -66,11 +71,10 @@ export const run = async (buffers, apiKey) => {
 
     // Schedule index deletion after 15 minutes
     setTimeout(async () => {
-      await deleteIndex(indexName);
-    }, 15 * 60 * 1000);
+      await deleteAllVectors();
+    }, 10 * 60 * 1000);
 
-    // Return the index name
-    return indexName;
+    return namespace;
 
   } catch (error) {
     console.log('error', error);

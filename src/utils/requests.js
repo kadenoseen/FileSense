@@ -1,63 +1,89 @@
 // Import required modules
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 // Load environment variables
 dotenv.config();
 
-// Function to delete a Pinecone index
-export async function deleteIndex(indexName) {
-  console.log('Deleting index', indexName);
+const url = `https://${process.env.PINECONE_INDEX}-d7c3cfe.svc.us-west4-gcp.pinecone.io/vectors/delete`;
 
-  // Make a DELETE request to the Pinecone API
-  const response = await fetch(`https://controller.us-west4-gcp.pinecone.io/databases/${indexName}`, {
-    method: 'DELETE',
-    headers: {
-      'Accept': 'text/plain',
-      'Api-Key': process.env.PINECONE_API_KEY,
-    },
-  });
+export async function deleteAllVectors(){
+  const indexStats = await describeIndexStats();
+  const namespaces = Object.keys(indexStats.namespaces);
+  await deleteVectors(namespaces);
+}
 
-  // Check if the deletion was successful
-  if (response.ok) {
-    console.log('Index deleted successfully');
-  } else {
-    console.error('Error deleting index:', response.statusText);
+// Function to check number of vectors in index
+export async function describeIndexStats() {
+  const url = `https://${process.env.PINECONE_INDEX}-d7c3cfe.svc.us-west4-gcp.pinecone.io/describe_index_stats`;
+
+    try {
+      const response = await axios.post(url, {}, {
+        headers: {
+          'Api-Key': process.env.PINECONE_API_KEY,
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        console.error('Error retrieving index stats:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error retrieving index stats:', error.message);
+      return null;
+    }
+}
+
+
+// Function to delete all vectors in index
+export async function deleteVectors(namespaces) {
+  try {
+    for(let i = 0; i < namespaces.length; i++){
+      deleteVector(namespaces[i]);
+    }
+    return true;
+  } catch (error) {
+    console.error('Error deleting all vectors:', error);
+    throw error;
   }
 }
 
-// Function to create a Pinecone index
-export async function createIndex() {
-  // Generate a unique index name
-  const indexName = `testing-${uuidv4()}`;
 
-  // Define index configuration data
-  const indexData = {
-    "metric": "cosine",
-    "pods": 1,
-    "replicas": 1,
-    "pod_type": "p1.x1",
-    "name": indexName,
-    "dimension": 1536
-  };
-
-  // Make a POST request to the Pinecone API to create the index
-  const response = await fetch('https://controller.us-west4-gcp.pinecone.io/databases', {
-    method: 'POST',
-    headers: {
-      'Accept': 'text/plain',
-      'Content-Type': 'application/json',
-      'Api-Key': process.env.PINECONE_API_KEY,
-    },
-    body: JSON.stringify(indexData),
-  });
-
-  // Check if the index was created successfully
-  if (response.ok) {
-    console.log('Index created successfully');
-    return indexName;
+export async function deleteVector(namespace){
+  const response = await axios.post(
+    url,
+    { deleteAll: true, namespace: namespace },
+    {
+      headers: {
+        'Api-Key': process.env.PINECONE_API_KEY,
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      },
+    }
+  );
+  if (response.status === 200) {
+    console.log(`Deleted all vectors in namespace ${namespace}`);
+    return true;
   } else {
-    console.error('Error creating index:', response.statusText);
-    return null;
+    console.log(`Error deleting  vectors in namespace ${namespace}.`);
+    return false;
   }
+}
+
+// generates random string
+export function generateRandomString() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = '';
+
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
 }
