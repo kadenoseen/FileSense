@@ -75,6 +75,11 @@ function updateContentWrapperPadding() {
   contentWrapper.getElementsByClassName.paddingTop = "0%";
 }
 
+// Function to generate a unique ID for each source popup
+function generateUniqueId(prefix = "source-popup") {
+  return `${prefix}-${Math.random().toString(36).substr(2, 10)}`;
+}
+
 // Function to send a message
 async function sendMessage() {
   const userInput = document.getElementById("user-input");
@@ -98,20 +103,28 @@ async function sendMessage() {
   let typingDots = 0;
   const typingInterval = setInterval(() => {
     if (typingDots === 4) typingDots += 1;
-    typingDots = (typingDots +  1) % 5;
+    typingDots = (typingDots + 1) % 5;
     typingMessage.innerHTML = `${".".repeat(typingDots)}`;
   }, 500);
 
   try {
     // Get the response from the AI model
     const aiResponse = await sendQuestion(message, fileHash);
-    
+    const sources = Array.isArray(aiResponse.sourceDocuments) ? aiResponse.sourceDocuments.map((doc, index) => {
+      const content = doc.pageContent || 'Unknown Content';
+      return `<div class="source-content">${index + 1}: ${content}</div>`;
+    }).join('') : 'Unknown Source';
+
     // Clear the typing message and interval
     clearInterval(typingInterval);
     chatHistory.removeChild(typingMessage);
     
     // Display AI response
-    chatHistory.innerHTML += `<div class="ai-message">${aiResponse.text}</div>`;
+    const aiResponseMessage = `<div class="ai-message">${aiResponse.text}<button class="sources-button" id="show-sources onclick="showSources()">Sources</button></div>`;
+    chatHistory.innerHTML += aiResponseMessage;
+
+    // Update the popup content
+    document.getElementById('popup-content').innerHTML = sources;
   } catch (error) {
     console.error("Error:", error);
     chatHistory.innerHTML += `<div>Sorry, an error occurred while processing your request.</div>`;
@@ -119,6 +132,32 @@ async function sendMessage() {
 
   chatHistory.scrollTop = chatHistory.scrollHeight;
 }
+
+function showSources() {
+  const popup = document.getElementById('source-popup');
+  popup.style.display = 'block';
+
+  const closeButton = popup.querySelector('.close');
+  closeButton.onclick = () => {
+    popup.style.display = 'none';
+  };
+}
+
+document.addEventListener("click", (event) => {
+  const popup = document.getElementById("source-popup");
+
+  if (event.target.classList.contains("sources-button")) {
+    const sourcesButton = event.target;
+    if (popup.style.display === "none" || popup.style.display === "") {
+      popup.style.display = "block";
+    } else if (popup.style.display === "block") {
+      popup.style.display = "none";
+    }
+  } else if (popup.style.display === "block") {
+    popup.style.display = "none";
+  }
+});
+
 
 // Event listener for the "Send" button click
 document.getElementById("send-button").addEventListener("click", sendMessage);

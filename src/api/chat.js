@@ -4,6 +4,9 @@ import { PineconeStore } from 'langchain/vectorstores';
 import { makeChat } from './makechat.js';
 import { pinecone } from '../utils/pinecone-client.js';
 import readline from 'readline';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Create readline interface for command line input
 const rl = readline.createInterface({
@@ -12,16 +15,16 @@ const rl = readline.createInterface({
 });
 
 // Function to ask a question and get a response using the provided index name and API key
-export async function askQuestion(question, indexName, apiKey) {
-  console.log(`Index Name: ${indexName}`);
-  const index = pinecone.Index(indexName);
+export async function askQuestion(question, namespace, apiKey) {
+  const index = pinecone.Index(process.env.PINECONE_INDEX);
   const vectorStore = await PineconeStore.fromExistingIndex(
     new OpenAIEmbeddings({ openAIApiKey: apiKey }),
     {
       pineconeIndex: index,
-      textKey: 'text',
+      namespace: namespace,
     },
   );
+
   const chain = makeChat(vectorStore, apiKey);
 
   try {
@@ -29,8 +32,8 @@ export async function askQuestion(question, indexName, apiKey) {
       question,
       chat_history: [],
     });
-
     return response;
+
   } catch (error) {
     console.log('error', error);
     throw error;

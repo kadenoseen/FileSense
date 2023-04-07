@@ -6,10 +6,11 @@ import { askQuestion } from './src/api/chat.js';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
 import { createFileHash, createUrlHash } from './src/utils/getHash.js';
+import { deleteVector } from './src/utils/requests.js';
 
 dotenv.config();
 
-const fileHashToIndex = {};
+let savedHashes = {};
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,19 @@ app.get('*', (req, res) => {
   res.sendFile('public/index.html');
 });
 
+function scheduleDeletion(fileHash) {
+  const twoDaysInMilliseconds = 60 * 1000;
+  setTimeout(async () => {
+    try {
+      delete savedHashes[fileHash];
+      await deleteVector(savedHashes[fileHash]);
+      console.log(`Deleted namespace ${fileHash} after 48 hours.`);
+    } catch (error) {
+      console.error(`Error deleting namespace:`, error);
+    }
+  }, twoDaysInMilliseconds);
+}
+
 app.post('/api/process-files', upload.array('files'), async (req, res) => {
   try {
     const files = req.files.map((file) => Buffer.from(file.buffer));
@@ -32,13 +46,12 @@ app.post('/api/process-files', upload.array('files'), async (req, res) => {
     if(createUrlHash(apiKey) === process.env.PASSWORD){
       apiKey = process.env.OPEN_API;
     }
-    let index = "";
-    if (fileHashToIndex[fileHash]) {
+
+    if (savedHashes[fileHash]) {
       console.log("File already processed");
-      index = fileHashToIndex[fileHash];
     }else{
-      index = await processFiles(files, apiKey);
-      fileHashToIndex[fileHash] = index;
+      savedHashes[fileHash] = await processFiles(files, apiKey);
+      scheduleDeletion(fileHash);
     }
     res.status(200).json({ message: 'Files processed successfully', fileHash });
   } catch (error) {
@@ -57,9 +70,12 @@ app.post("/ask", async (req, res) => {
       res.status(400).json({ error: "Invalid question, file hash, or API key" });
       return;
     }
+    if(!savedHashes[fileHash]){
+      res.status(400).json({ error: "File hash not found" });
+      return;
+    }
 
-    const index = fileHashToIndex[fileHash];
-    const response = await askQuestion(question, index, apiKey);
+    const response = await askQuestion(question, savedHashes[fileHash], apiKey);
     res.json(response);
   } catch (error) {
     console.error("Error:", error);
