@@ -6,10 +6,10 @@ import { askQuestion } from './src/api/chat.js';
 import dotenv from 'dotenv';
 import { Configuration, OpenAIApi } from 'openai';
 import { createFileHash, createUrlHash } from './src/utils/getHash.js';
-import { deleteVector } from './src/utils/requests.js';
+import { deleteVector, deleteAllVectors } from './src/utils/requests.js';
 
 dotenv.config();
-
+deleteAllVectors();
 let savedHashes = {};
 
 const app = express();
