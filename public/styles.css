@@ -263,6 +263,16 @@ div.api-key-wrapper {
   overflow: auto;
   line-height: 2;
   background-color: rgba(0,0,0,0.4);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn { /* Define fadeIn animation */
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .modal-content {

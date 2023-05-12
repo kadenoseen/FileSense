@@ -243,6 +243,7 @@ async function testApiKey(apiKey) {
 // Event listener for the help button click
 document.getElementById("help-button").addEventListener("click", () => {
   document.getElementById("api-key-modal").style.display = "block";
+  
 });
 
 // Function to close the modal when clicking outside the content or on the content itself

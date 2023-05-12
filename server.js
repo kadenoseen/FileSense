@@ -26,7 +26,10 @@ app.get('*', (req, res) => {
 });
 
 function scheduleDeletion(fileHash) {
-  const twoDaysInMilliseconds = 48 * 60 * 60 * 1000;
+  // Use commented out value in production
+  //const twoDaysInMilliseconds = 48 * 60 * 60 * 1000;
+
+  const twoDaysInMilliseconds = 2 * 60 * 1000; // 2 minutes for testing
   setTimeout(async () => {
     try {
       delete savedHashes[fileHash];
